@@ -12,11 +12,9 @@ export const metadata: Metadata = {
 export default function CheckoutPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader cartCount={3} />
       <main className="flex-1">
         <CheckoutView />
       </main>
-      <SiteFooter />
     </div>
   )
 }

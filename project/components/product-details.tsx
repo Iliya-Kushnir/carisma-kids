@@ -3,69 +3,117 @@
 import { useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import type { Product } from "@/lib/products"
 
-const tabs = [
-  {
-    value: "description",
-    label: "ОПИС",
-    body: (
-      <>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Стильне худі oversize для хлопчиків. Виготовлене з якісної бавовни з додаванням еластану — м&apos;яке,
-          приємне до тіла та добре тримає форму. Ідеально підходить для повсякденних образів у будь-яку пору року.
-        </p>
+type Props = {
+  product: Product
+}
+
+export function ProductDetails({ product }: Props) {
+  const [active, setActive] = useState("description")
+
+  const detailsList = [
+    ["Склад", product.details.composition],
+    ["Крій", product.details.fit],
+    ["Сезон", product.details.season],
+    ["Країна бренду", product.details.brand_country ?? "Україна"],
+    ["Догляд", product.details.care ?? "Прання при 30°C"],
+  ].filter(([, value]) => Boolean(value))
+
+  const descriptionItems = [
+    product.details.composition
+      ? `Тканина: ${product.details.composition}`
+      : null,
+
+    product.details.season
+      ? `Сезон: ${product.details.season}`
+      : null,
+
+    product.details.fit
+      ? `Крій: ${product.details.fit}`
+      : null,
+
+    product.details.hood
+      ? `Капюшон: ${product.details.hood}`
+      : null,
+
+    product.details.cuffs
+      ? product.details.cuffs
+      : null,
+  ].filter(Boolean) as string[]
+
+  const tabs = [
+    {
+      value: "description",
+      label: "ОПИС",
+      body: (
+        <>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {product.description || "Опис товару відсутній."}
+          </p>
+
+          {descriptionItems.length > 0 && (
+            <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+              {descriptionItems.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2"
+                >
+                  <span className="mt-2 size-1 shrink-0 rounded-full bg-foreground" />
+
+                  {item}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ),
+    },
+
+    {
+      value: "specs",
+      label: "ХАРАКТЕРИСТИКИ",
+      body: (
         <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
-          {[
-            "Тканина: 95% бавовна, 5% еластан",
-            "Сезон: весна / осінь / зима",
-            "Крій: oversize",
-            "Капюшон: подвійний",
-            "Манжети та низ на резинці",
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2">
-              <span className="mt-2 size-1 shrink-0 rounded-full bg-foreground" />
-              {item}
+          {detailsList.map(([key, value]) => (
+            <li
+              key={key}
+              className="flex justify-between gap-4 border-b border-border/60 pb-2"
+            >
+              <span className="font-medium text-foreground">
+                {key}
+              </span>
+
+              <span className="text-right">
+                {value}
+              </span>
             </li>
           ))}
         </ul>
-      </>
-    ),
-  },
-  {
-    value: "specs",
-    label: "ХАРАКТЕРИСТИКИ",
-    body: (
-      <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
-        {[
-          ["Склад", "95% бавовна, 5% еластан"],
-          ["Крій", "Oversize"],
-          ["Сезон", "Демісезон / зима"],
-          ["Країна бренду", "Україна"],
-          ["Догляд", "Прання при 30°C"],
-        ].map(([k, v]) => (
-          <li key={k} className="flex justify-between gap-4 border-b border-border/60 pb-2">
-            <span className="font-medium text-foreground">{k}</span>
-            <span className="text-right">{v}</span>
-          </li>
-        ))}
-      </ul>
-    ),
-  },
-  {
-    value: "care",
-    label: "ДОГЛЯД",
-    body: (
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        Прати при температурі до 30°C у режимі для делікатних тканин. Не використовувати відбілювач. Прасувати при
-        низькій температурі. Не сушити в сушильній машині — рекомендоване природне сушіння.
-      </p>
-    ),
-  },
-]
+      ),
+    },
 
-export function ProductDetails() {
-  const [active, setActive] = useState("description")
-  const current = tabs.find((t) => t.value === active)!
+    {
+      value: "care",
+      label: "ДОГЛЯД",
+      body: (
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {product.details.care ??
+            "Прати при температурі до 30°C у режимі для делікатних тканин. Не використовувати відбілювач. Прасувати при низькій температурі. Рекомендоване природне сушіння."}
+        </p>
+      ),
+    },
+  ]
+
+  const current = tabs.find(
+    (tab) => tab.value === active
+  )!
+
+  const detailImage =
+    product.images[2]?.url ??
+    product.images[1]?.url ??
+    product.images[0]?.url ??
+    "/placeholder.svg"
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
@@ -78,20 +126,25 @@ export function ProductDetails() {
                 onClick={() => setActive(tab.value)}
                 className={cn(
                   "text-xs font-semibold tracking-wide transition-colors",
-                  active === tab.value ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                  active === tab.value
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {tab.label}
               </button>
             ))}
           </div>
-          <div className="flex flex-col gap-5">{current.body}</div>
+
+          <div className="flex flex-col gap-5">
+            {current.body}
+          </div>
         </div>
 
         <div className="relative order-first aspect-[4/3] overflow-hidden md:order-last md:aspect-auto md:min-h-64">
           <Image
-            src="/products/hoodie-3.png"
-            alt="Худі street — вид ззаду"
+            src={detailImage}
+            alt={`${product.name} — деталі`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 40vw"

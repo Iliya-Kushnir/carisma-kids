@@ -1,22 +1,163 @@
-export type Category =
-  | 'Дівчаткам'
-  | 'Хлопчикам'
-  | 'Костюми'
-  | 'Верхній одяг'
-  | 'Взуття'
-  | 'Аксесуари'
+export type Category = string
+export type ColorKey = string
 
-export type ColorKey = 'black' | 'beige' | 'grey' | 'cream' | 'white'
+export type ProductColor = {
+  key: string
+  name: string
+  hex: string
+}
 
-export const COLOR_META: Record<ColorKey, { label: string; swatch: string }> = {
-  black: { label: 'Чорний', swatch: '#1a1a1a' },
-  beige: { label: 'Бежевий', swatch: '#cbb79c' },
-  grey: { label: 'Сірий', swatch: '#9a9a9a' },
-  cream: { label: 'Молочний', swatch: '#e8e2d4' },
-  white: { label: 'Білий', swatch: '#f4f4f4' },
+export type ProductImage = {
+  url: string
+  path: string
+  color: string | null
+  alt: string
+  sort: number
+}
+
+export type ProductVariant = {
+  id?: string
+  color: string
+  size: string
+  stock: number
+}
+
+export type ProductDetails = {
+  composition?: string
+  season?: string
+  fit?: string
+  hood?: string
+  cuffs?: string
+
+  [key: string]: string | undefined
 }
 
 export type Product = {
+  id: string
+
+  name: string
+
+  // временная совместимость со старым ProductCard
+  title: string
+
+  slug: string
+  sku: string
+
+  price: number
+  compare_at_price: number | null
+
+  description: string
+
+  product_type: string
+
+  audience: 'boys' | 'girls' | 'unisex'
+
+  categories: Category[]
+
+  sizes: string[]
+
+  colors: ColorKey[]
+
+  colorOptions: ProductColor[]
+
+  images: ProductImage[]
+
+  variants: ProductVariant[]
+
+  details: ProductDetails
+
+  is_featured: boolean
+  is_active: boolean
+
+  // первая фотография товара
+  image: string
+}
+
+export const CATEGORIES: Category[] = [
+  'Хлопчикам',
+  'Дівчаткам',
+  'Худі',
+  'Світшоти',
+  'Футболки',
+  'Штани',
+  'Джинси',
+  'Куртки',
+  'Шорти',
+  'Аксесуари',
+]
+
+export const SIZES = [
+  '90',
+  '100',
+  '110',
+  '120',
+  '130',
+  '140',
+  '150',
+  '160',
+]
+
+export const COLOR_META: Record<
+  ColorKey,
+  {
+    label: string
+    swatch: string
+  }
+> = {
+  black: {
+    label: 'Чорний',
+    swatch: '#292825',
+  },
+
+  gray: {
+    label: 'Сірий',
+    swatch: '#85817B',
+  },
+
+  // оставляем и старый вариант названия
+  grey: {
+    label: 'Сірий',
+    swatch: '#85817B',
+  },
+
+  beige: {
+    label: 'Бежевий',
+    swatch: '#CFC1AA',
+  },
+
+  cream: {
+    label: 'Молочний',
+    swatch: '#E8E2D4',
+  },
+
+  blue: {
+    label: 'Синій',
+    swatch: '#43566B',
+  },
+
+  white: {
+    label: 'Білий',
+    swatch: '#F5F5F5',
+  },
+}
+
+export const PRICE_MIN = 0
+export const PRICE_MAX = 5000
+
+export function formatPrice(value: number) {
+  return `${value.toLocaleString('uk-UA')} грн`
+}
+
+/*
+  ВРЕМЕННАЯ совместимость со старым checkout-view.tsx.
+
+  Каталог ЭТО НЕ ИСПОЛЬЗУЕТ.
+  Каталог получает товары из Supabase.
+
+  Когда будем переписывать корзину/checkout под Supabase —
+  этот PRODUCTS удалим.
+*/
+export type LegacyProduct = {
   id: string
   title: string
   price: number
@@ -26,131 +167,4 @@ export type Product = {
   colors: ColorKey[]
 }
 
-export const CATEGORIES: Category[] = [
-  'Дівчаткам',
-  'Хлопчикам',
-  'Костюми',
-  'Верхній одяг',
-  'Взуття',
-  'Аксесуари',
-]
-
-export const SIZES = ['92', '98', '104', '110', '116', '122', '128']
-
-export const PRODUCTS: Product[] = [
-  {
-    id: 'cool-happy',
-    title: 'Костюм Cool & Happy',
-    price: 1190,
-    image: '/products/cool-happy-suit.png',
-    categories: ['Хлопчикам', 'Костюми'],
-    sizes: ['92', '98', '104', '110', '116'],
-    colors: ['beige', 'cream', 'grey'],
-  },
-  {
-    id: 'zip-hoodie',
-    title: 'Худі на замку',
-    price: 1090,
-    image: '/products/black-zip-hoodie.png',
-    categories: ['Хлопчикам', 'Дівчаткам'],
-    sizes: ['98', '104', '110', '116', '122'],
-    colors: ['black', 'grey'],
-  },
-  {
-    id: 'demi-jacket',
-    title: 'Куртка демісезонна',
-    price: 1590,
-    image: '/products/cream-puffer.png',
-    categories: ['Верхній одяг', 'Хлопчикам', 'Дівчаткам'],
-    sizes: ['104', '110', '116', '122', '128'],
-    colors: ['cream', 'beige'],
-  },
-  {
-    id: 'base-suit',
-    title: 'Костюм Base',
-    price: 1190,
-    image: '/products/base-black-suit.png',
-    categories: ['Хлопчикам', 'Костюми'],
-    sizes: ['92', '98', '104', '110', '116'],
-    colors: ['black'],
-  },
-  {
-    id: 'ny-cap-beige',
-    title: 'Кепка NY',
-    price: 490,
-    image: '/products/ny-cap-beige.png',
-    categories: ['Аксесуари'],
-    sizes: ['92', '98', '104', '110', '116', '122', '128'],
-    colors: ['beige', 'black'],
-  },
-  {
-    id: 'beige-knit',
-    title: 'Костюм Beige Knit',
-    price: 1190,
-    image: '/products/beige-knit-suit.png',
-    categories: ['Дівчаткам', 'Костюми'],
-    sizes: ['92', '98', '104', '110'],
-    colors: ['beige', 'cream'],
-  },
-  {
-    id: 'white-sneakers',
-    title: 'Кросівки White Basic',
-    price: 990,
-    image: '/products/white-sneakers.png',
-    categories: ['Взуття'],
-    sizes: ['110', '116', '122', '128'],
-    colors: ['white'],
-  },
-  {
-    id: 'ny-cap-black',
-    title: 'Кепка NY Black',
-    price: 490,
-    image: '/products/ny-cap-black.png',
-    categories: ['Аксесуари'],
-    sizes: ['92', '98', '104', '110', '116', '122', '128'],
-    colors: ['black'],
-  },
-  {
-    id: 'grey-hoodie',
-    title: 'Худі Basic Grey',
-    price: 890,
-    image: '/products/grey-hoodie.png',
-    categories: ['Хлопчикам', 'Дівчаткам'],
-    sizes: ['98', '104', '110', '116'],
-    colors: ['grey'],
-  },
-  {
-    id: 'black-tee',
-    title: 'Футболка Essential',
-    price: 490,
-    image: '/products/black-tee.png',
-    categories: ['Хлопчикам', 'Дівчаткам'],
-    sizes: ['92', '98', '104', '110', '116', '122'],
-    colors: ['black', 'white'],
-  },
-  {
-    id: 'beige-coat',
-    title: 'Пальто Wool Warm',
-    price: 1990,
-    image: '/products/beige-coat.png',
-    categories: ['Верхній одяг', 'Дівчаткам'],
-    sizes: ['104', '110', '116', '122', '128'],
-    colors: ['beige'],
-  },
-  {
-    id: 'black-boots',
-    title: 'Черевики Winter',
-    price: 1290,
-    image: '/products/black-boots.png',
-    categories: ['Взуття'],
-    sizes: ['104', '110', '116', '122', '128'],
-    colors: ['black'],
-  },
-]
-
-export const PRICE_MIN = 0
-export const PRICE_MAX = 2000
-
-export function formatPrice(value: number) {
-  return `${value.toLocaleString('uk-UA').replace(/,/g, ' ')} грн`
-}
+export const PRODUCTS: LegacyProduct[] = []

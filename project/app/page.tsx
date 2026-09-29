@@ -9,7 +9,6 @@ import { SiteFooter } from "@/components/footer"
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader />
       <main className="flex-1">
         <div className="pt-4 lg:pt-6">
           <Hero />
@@ -19,7 +18,6 @@ export default function HomePage() {
         <PopularProducts />
         <InstagramSection />
       </main>
-      <SiteFooter />
     </div>
   )
 }
