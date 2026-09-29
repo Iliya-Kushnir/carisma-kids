@@ -7,6 +7,8 @@ import { InstagramSection } from "@/components/instagram-section"
 import { SiteFooter } from "@/components/footer"
 
 export default function HomePage() {
+console.log("Rendering HomePage");
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <main className="flex-1">
