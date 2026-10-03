@@ -36,7 +36,7 @@ export function Hero() {
                 стріт-стайл для маленьких особистостей
               </p>
               <a
-                href="#catalog"
+                href="/catalog"
                 className="mt-6 inline-flex items-center gap-2 bg-background px-6 py-3 text-xs font-semibold tracking-widest text-foreground shadow-sm transition-colors hover:bg-foreground hover:text-background"
               >
                 ДО КАТАЛОГУ

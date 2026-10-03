@@ -11,7 +11,7 @@ export function Breadcrumbs({ items }: { items: string[] }) {
               {isLast ? (
                 <span className="font-semibold text-foreground">{item}</span>
               ) : (
-                <a href="#" className="transition-colors hover:text-foreground">
+                <a href="/" className="transition-colors hover:text-foreground">
                   {item}
                 </a>
               )}

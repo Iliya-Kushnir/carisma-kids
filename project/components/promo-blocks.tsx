@@ -1,8 +1,8 @@
 import Image from "next/image"
 
 const cards = [
-  { title: "ХЛОПЧИКАМ", image: "/images/v2/cat-boys.png" },
-  { title: "ДІВЧАТКАМ", image: "/images/v2/cat-girls.png" },
+  { title: "ХЛОПЧИКАМ", image: "/images/v2/cat-boys.png", url: "/catalog?category=Хлопчикам" },
+  { title: "ДІВЧАТКАМ", image: "/images/v2/cat-girls.png", url: "/catalog?category=Дівчаткам" },
   { title: "НОВИНКИ", image: "/images/v2/cat-new.png" },
   { title: "БЕСТСЕЛЕРИ", image: "/images/v2/cat-best.png" },
 ]
@@ -29,7 +29,7 @@ export function PromoBlocks() {
                 {card.title}
               </h3>
               <a
-                href="#"
+                href={card.url || "#"}
                 className="inline-flex items-center border border-background/70 bg-background/10 px-4 py-2 text-[10px] font-semibold tracking-widest text-background backdrop-blur-sm transition-colors hover:bg-background hover:text-foreground"
               >
                 ПЕРЕГЛЯНУТИ

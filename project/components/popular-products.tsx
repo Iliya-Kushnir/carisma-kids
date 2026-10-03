@@ -54,7 +54,7 @@ export function PopularProducts() {
             БЕСТСЕЛЕРИ
           </h2>
           <a
-            href="#"
+            href="/catalog"
             className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             Дивитись усі

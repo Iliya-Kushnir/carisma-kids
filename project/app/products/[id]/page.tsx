@@ -56,11 +56,13 @@ export default async function ProductPage({ params }: Props) {
               </Link>
             </li>
 
+
+
             <li aria-hidden>·</li>
 
             <li>
               <Link
-                href="/catalog"
+                href={`/catalog?category=${product.categories[0]}`}
                 className="transition-colors hover:text-foreground"
               >
                 {product.categories[0] ?? "Каталог"}

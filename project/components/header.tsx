@@ -28,11 +28,11 @@ const NAV_LINKS = [
   },
   {
     label: "ДІВЧАТКАМ",
-    href: "/catalog",
+    href: "/catalog?category=Дівчаткам",
   },
   {
     label: "ХЛОПЧИКАМ",
-    href: "/catalog",
+    href: "/catalog?category=Хлопчикам",
   },
   {
     label: "ПРО НАС",
@@ -150,12 +150,6 @@ export function SiteHeader() {
                         link.label
                       }
 
-                      {link.hasDropdown && (
-                        <ChevronDown
-                          className="size-4"
-                          aria-hidden="true"
-                        />
-                      )}
                     </Link>
                   </li>
                 )
@@ -166,29 +160,6 @@ export function SiteHeader() {
           {/* Actions */}
 
           <div className="flex items-center gap-4 md:gap-5">
-            <button
-              type="button"
-              aria-label="Пошук"
-              className="transition-opacity hover:opacity-60"
-            >
-              <Search className="size-5" />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Кабінет"
-              className="hidden transition-opacity hover:opacity-60 sm:block"
-            >
-              <User className="size-5" />
-            </button>
-
-            <button
-              type="button"
-              aria-label="Список бажань"
-              className="transition-opacity hover:opacity-60"
-            >
-              <Heart className="size-5" />
-            </button>
 
             {/* Cart */}
 
