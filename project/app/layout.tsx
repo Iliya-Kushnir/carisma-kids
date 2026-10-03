@@ -10,6 +10,7 @@ import "./globals.css"
 import { SiteHeader } from "@/components/header"
 import { SiteFooter } from "@/components/footer"
 import { CartProvider } from "@/context/cart-context"
+import { AppShell } from "@/components/app-shell"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,9 +40,9 @@ export default function RootLayout({
       >
       <body className="bg-background font-sans antialiased">
         <CartProvider>
-          <SiteHeader />
+        <AppShell>
           {children}
-          <SiteFooter />
+        </AppShell>
         </CartProvider>
       </body>
     </html>

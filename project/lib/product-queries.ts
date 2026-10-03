@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from "@/lib/supabase/server"
 
 import type {
   Product,
@@ -6,28 +6,35 @@ import type {
   ProductImage,
   ProductVariant,
   ProductDetails,
-} from '@/lib/products'
+} from "@/lib/products"
+
+/* =========================================================
+   NORMALIZE PRODUCT
+========================================================= */
 
 function normalizeProduct(product: any): Product {
-  const colorOptions: ProductColor[] = Array.isArray(product.colors)
-    ? product.colors
-    : []
+  const colorOptions: ProductColor[] =
+    Array.isArray(product.colors)
+      ? product.colors
+      : []
 
-  const images: ProductImage[] = Array.isArray(product.images)
-    ? [...product.images].sort(
-        (a, b) =>
-          Number(a.sort ?? 0) -
-          Number(b.sort ?? 0)
-      )
-    : []
+  const images: ProductImage[] =
+    Array.isArray(product.images)
+      ? [...product.images].sort(
+          (a, b) =>
+            Number(a.sort ?? 0) -
+            Number(b.sort ?? 0)
+        )
+      : []
 
-  const variants: ProductVariant[] = Array.isArray(product.variants)
-    ? product.variants
-    : []
+  const variants: ProductVariant[] =
+    Array.isArray(product.variants)
+      ? product.variants
+      : []
 
   const details: ProductDetails =
     product.details &&
-    typeof product.details === 'object'
+    typeof product.details === "object"
       ? product.details
       : {}
 
@@ -36,7 +43,7 @@ function normalizeProduct(product: any): Product {
 
     name: product.name,
 
-    // для старого ProductCard
+    // Совместимость со старым ProductCard
     title: product.name,
 
     slug: product.slug,
@@ -48,22 +55,40 @@ function normalizeProduct(product: any): Product {
     compare_at_price:
       product.compare_at_price !== null &&
       product.compare_at_price !== undefined
-        ? Number(product.compare_at_price)
+        ? Number(
+            product.compare_at_price
+          )
         : null,
 
-    description: product.description ?? '',
+    description:
+      product.description ?? "",
 
-    product_type: product.product_type,
+    product_type:
+      product.product_type ?? "",
 
-    audience: product.audience,
+    audience:
+      product.audience ??
+      "unisex",
 
-    categories: product.categories ?? [],
+    categories:
+      Array.isArray(
+        product.categories
+      )
+        ? product.categories
+        : [],
 
-    sizes: product.sizes ?? [],
+    sizes:
+      Array.isArray(
+        product.sizes
+      )
+        ? product.sizes
+        : [],
 
-    colors: colorOptions.map(
-      (color) => color.key
-    ),
+    colors:
+      colorOptions.map(
+        (color) =>
+          color.key
+      ),
 
     colorOptions,
 
@@ -74,45 +99,65 @@ function normalizeProduct(product: any): Product {
     details,
 
     is_featured:
-      product.is_featured ?? false,
+      product.is_featured ??
+      false,
 
     is_active:
-      product.is_active ?? true,
+      product.is_active ??
+      true,
 
     image:
       images[0]?.url ??
-      '/products/placeholder.png',
+      "/placeholder.svg",
   }
 }
 
-export async function getProducts(): Promise<Product[]> {
+/* =========================================================
+   ALL PRODUCTS
+========================================================= */
+
+export async function getProducts(): Promise<
+  Product[]
+> {
   const supabase =
     await createClient()
 
   const { data, error } =
     await supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', {
-        ascending: false,
-      })
+      .from("products")
+      .select("*")
+      .eq(
+        "is_active",
+        true
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false,
+        }
+      )
 
   if (error) {
     console.error(
-      'getProducts error:',
+      "getProducts error:",
       error
     )
 
     throw new Error(
-      'Не вдалося отримати товари'
+      "Не вдалося отримати товари"
     )
   }
 
-  return (data ?? []).map(
+  return (
+    data ?? []
+  ).map(
     normalizeProduct
   )
 }
+
+/* =========================================================
+   SINGLE PRODUCT
+========================================================= */
 
 export async function getProductById(
   id: string
@@ -122,49 +167,196 @@ export async function getProductById(
 
   const { data, error } =
     await supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
-      .eq('is_active', true)
+      .from("products")
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .eq(
+        "is_active",
+        true
+      )
       .single()
 
-  if (error || !data) {
+  if (
+    error ||
+    !data
+  ) {
     return null
   }
 
-  return normalizeProduct(data)
+  return normalizeProduct(
+    data
+  )
 }
 
+/* =========================================================
+   RELATED PRODUCTS
+========================================================= */
+
 export async function getRelatedProducts(
-  productId: string,
-  productType: string,
+  currentProduct: Product,
   limit = 5
 ): Promise<Product[]> {
   const supabase =
     await createClient()
 
+  /*
+   * Получаем активные товары,
+   * кроме текущего.
+   *
+   * Не фильтруем сразу по product_type,
+   * потому что если другого товара
+   * такого типа нет — рекомендации
+   * вообще исчезнут.
+   */
   const { data, error } =
     await supabase
-      .from('products')
-      .select('*')
-      .eq('is_active', true)
+      .from("products")
+      .select("*")
       .eq(
-        'product_type',
-        productType
+        "is_active",
+        true
       )
-      .neq('id', productId)
-      .limit(limit)
+      .neq(
+        "id",
+        currentProduct.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false,
+        }
+      )
+      .limit(50)
 
   if (error) {
     console.error(
-      'getRelatedProducts error:',
+      "getRelatedProducts error:",
       error
     )
 
     return []
   }
 
-  return (data ?? []).map(
-    normalizeProduct
+  const products =
+    (data ?? []).map(
+      normalizeProduct
+    )
+
+  /*
+   * Оцениваем каждый товар.
+   *
+   * Чем больше score —
+   * тем выше он будет
+   * в рекомендациях.
+   */
+  const scoredProducts =
+    products.map(
+      (product) => {
+        let score = 0
+
+        /* ---------------------
+           SAME PRODUCT TYPE
+        --------------------- */
+
+        if (
+          product.product_type &&
+          product.product_type ===
+            currentProduct.product_type
+        ) {
+          score += 100
+        }
+
+        /* ---------------------
+           SAME CATEGORIES
+        --------------------- */
+
+        const sharedCategories =
+          product.categories.filter(
+            (category) =>
+              currentProduct.categories.includes(
+                category
+              )
+          )
+
+        score +=
+          sharedCategories.length *
+          30
+
+        /* ---------------------
+           SAME AUDIENCE
+        --------------------- */
+
+        if (
+          product.audience ===
+          currentProduct.audience
+        ) {
+          score += 25
+        } else if (
+          product.audience ===
+            "unisex" ||
+          currentProduct.audience ===
+            "unisex"
+        ) {
+          score += 10
+        }
+
+        /* ---------------------
+           FEATURED
+        --------------------- */
+
+        if (
+          product.is_featured
+        ) {
+          score += 5
+        }
+
+        /* ---------------------
+           HAS STOCK
+        --------------------- */
+
+        const hasStock =
+          product.variants.some(
+            (variant) =>
+              Number(
+                variant.stock
+              ) > 0
+          )
+
+        if (hasStock) {
+          score += 3
+        }
+
+        return {
+          product,
+          score,
+        }
+      }
+    )
+
+  /*
+   * Сначала самые похожие.
+   *
+   * Если похожих мало,
+   * остальные активные товары
+   * всё равно смогут попасть
+   * в блок.
+   */
+  scoredProducts.sort(
+    (a, b) =>
+      b.score -
+      a.score
   )
+
+  return scoredProducts
+    .slice(
+      0,
+      limit
+    )
+    .map(
+      (item) =>
+        item.product
+    )
 }

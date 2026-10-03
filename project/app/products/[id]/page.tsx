@@ -32,8 +32,7 @@ export default async function ProductPage({ params }: Props) {
   }
 
   const recommendedProducts = await getRelatedProducts(
-    product.id,
-    product.product_type,
+    product,
     5
   )
 
